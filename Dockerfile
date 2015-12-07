@@ -52,4 +52,3 @@ RUN     ln -s /var/canvas/script/canvas_init /etc/init.d/canvas_init
 RUN     update-rc.d canvas_init defaults
 
 
-
