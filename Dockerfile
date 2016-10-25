@@ -29,26 +29,33 @@ RUN     cd /usr/src/Python-2.7.10 && ./configure && make altinstall
 
 
 # intall node
-RUN     curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
-RUN     apt-get install --yes nodejs
+RUN     curl -sL https://deb.nodesource.com/setup_6.x | bash -
+RUN     apt-get install nodejs
 
 # get canvas and install
-RUN     cd /var && git clone https://github.com/instructure/canvas-lms.git canvas && cd canvas && git branch --set-upstream-to origin/stable
-RUN     cd /var/canvas && gem install bundler --version 1.7.11
-RUN     cd /var/canvas && bundle install --path vendor/bundle --without=sqlite mysql
-
-# copy config files
-RUN     cd /var/canvas && for config in amazon_s3 database \
-                          delayed_jobs domain file_store outgoing_mail security external_migration; \
-                          do cp config/$config.yml.example config/$config.yml; done
-RUN     cd /var/canvas && mkdir -p log tmp/pids public/assets public/stylesheets/compiled && touch Gemfile.lock
-
-# compile static files
-RUN     ln -s /usr/local/bin/python2.7 /usr/local/bin/python
-RUN     cd /var/canvas && npm install
+RUN     cd /var && git clone https://github.com/instructure/canvas-lms.git canvas
+WORKDIR /var/canvas
+RUN     git branch --set-upstream-to origin/stable
+RUN     gem install bundler --version 1.12.5
+RUN     bundle install --path vendor/bundle --without=sqlite mysql
 
 # Automation jobs
 RUN     ln -s /var/canvas/script/canvas_init /etc/init.d/canvas_init
 RUN     update-rc.d canvas_init defaults
 
+# copy config files
+RUN     for config in amazon_s3 database \
+            delayed_jobs domain file_store outgoing_mail security external_migration; \
+            do cp config/$config.yml.example config/$config.yml; done
 
+RUN     mkdir -p log tmp/pids public/assets public/stylesheets/compiled
+RUN     touch Gemfile.lock
+RUN     npm install
+RUN     npm install i18nliner@0.1.5
+ENV     CANVAS_BUILD_CONCURRENCY=1
+ENV     RAILS_ENV=production
+RUN     bundle exec rake --trace canvas:compile_assets[0,0,0,1]
+
+EXPOSE 80
+RUN     unlink /etc/apache2/sites-enabled/000-default.conf
+RUN     chown -R www-data:www-data /var/canvas
