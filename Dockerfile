@@ -36,6 +36,7 @@ RUN     apt-get install nodejs
 RUN     cd /var && git clone https://github.com/instructure/canvas-lms.git canvas
 WORKDIR /var/canvas
 RUN     git branch --set-upstream-to origin/stable
+RUN     git checkout release/2016-10-29.14
 RUN     gem install bundler --version 1.12.5
 RUN     bundle install --path vendor/bundle --without=sqlite mysql
 
@@ -47,15 +48,20 @@ RUN     update-rc.d canvas_init defaults
 RUN     for config in amazon_s3 database \
             delayed_jobs domain file_store outgoing_mail security external_migration; \
             do cp config/$config.yml.example config/$config.yml; done
-
 RUN     mkdir -p log tmp/pids public/assets public/stylesheets/compiled
 RUN     touch Gemfile.lock
+
+# create canvas user
+RUN     adduser --disabled-password --gecos canvas canvasuser
+RUN     chown -R canvasuser config/environment.rb log tmp public/assets \
+        public/stylesheets/compiled Gemfile.lock config.ru
+
+# install dependencies
 RUN     npm install
 RUN     npm install i18nliner@0.1.5
 ENV     CANVAS_BUILD_CONCURRENCY=1
 ENV     RAILS_ENV=production
 RUN     bundle exec rake --trace canvas:compile_assets[0,0,0,1]
 
-EXPOSE 80
+EXPOSE 80 443
 RUN     unlink /etc/apache2/sites-enabled/000-default.conf
-RUN     chown -R www-data:www-data /var/canvas
