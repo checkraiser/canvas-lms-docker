@@ -12,6 +12,10 @@ web: &WEB
     - './config/domain.yml:/var/canvas/config/domain.yml'
     - './config/security.yml:/var/canvas/config/security.yml'
     - './config/canvas.conf:/etc/apache2/sites-enabled/canvas.conf'
+  labels:
+    - convox.port.80.protocol=http
+    - convox.health.timeout=60
+    - convox.deployment.minimum=10
 
 web-nossl:
   <<: *WEB
