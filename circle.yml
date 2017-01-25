@@ -6,16 +6,14 @@ machine:
 
 dependencies:
   override:
-    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+    - echo ":)"
   post:
     - curl -Ls https://install.convox.com/linux.zip > convox.zip
     - sudo unzip convox.zip -d /usr/local/bin
 
 test:
-  pre:
-    - docker build -t checkraiser/canvas-lms-docker .
   override:
-    - docker push checkraiser/canvas-lms-docker
+    - cp .env.sample .env
 
 deployment:
   production:
