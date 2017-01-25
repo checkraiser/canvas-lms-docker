@@ -1,0 +1,18 @@
+---
+
+dependencies:
+  override:
+    - echo ":)"
+  post:
+    - curl -Ls https://install.convox.com/linux.zip > convox.zip
+    - sudo unzip convox.zip -d /usr/local/bin
+
+test:
+  override:
+    - echo "testing..."    
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - convox deploy --app canvas01 --rack canvas-test --file docker-compose.yml
