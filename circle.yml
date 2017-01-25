@@ -20,4 +20,4 @@ deployment:
     branch: master
     commands:
       - convox rack scale --count 10 --rack canvas-test
-      - convox deploy --app canvas01 --rack canvas-test --file docker-compose.yml
+      - convox deploy --app canvas02 --rack canvas-test --file docker-compose.yml
