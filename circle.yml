@@ -19,4 +19,4 @@ deployment:
   production:
     branch: master
     commands:
-      - convox deploy --app canvas02 --rack canvas-test --file docker-compose.yml
+      - convox deploy --app canvas03 --rack canvas-test --file docker-compose.yml
