@@ -1,15 +1,21 @@
 ---
 
+machine:
+  services:
+    - docker
+
 dependencies:
   override:
-    - echo ":)"
+    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
   post:
     - curl -Ls https://install.convox.com/linux.zip > convox.zip
     - sudo unzip convox.zip -d /usr/local/bin
 
 test:
+  pre:
+    - docker build -t checkraiser/canvas-lms-docker .
   override:
-    - echo "testing..."    
+    - docker push checkraiser/canvas-lms-docker
 
 deployment:
   production:

@@ -1,5 +1,5 @@
 web: &WEB
-  image: scisco/canvas-lms-docker:stable_2016-10-08
+  image: checkraiser/canvas-lms-docker
   # build: .
   entrypoint: ./start.sh
   env_file:
